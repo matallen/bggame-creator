@@ -3,6 +3,9 @@ package org.mnl.bgcreator;
 import static javafx.scene.layout.BackgroundRepeat.NO_REPEAT;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
+import org.mnl.bgcreator.domain.Deck;
 
 import javafx.application.Application;
 import javafx.event.EventHandler;
@@ -41,10 +44,20 @@ public class Main extends Application {
       // this defines the root folder for the game info. TODO: make this drop-down on the UI prior to loading the tabletop?
       File gameFolder=new File("src/main/resources/games", gameName);
       
-      Pane tabletop = new AnchorPane();
+      final Pane tabletop = new AnchorPane();
 //      tabletop.setStyle("tabletop");
       
-      tabletop.getChildren().addAll(Loader.loadCards(gameFolder));
+      final Deck deck=Loader.loadDeck(gameFolder);
+      deck.shuffle();
+      deck.onClick(new EventHandler<MouseEvent>() {
+        @Override public void handle(MouseEvent arg0) {
+          // turn over the top card
+          tabletop.getChildren().add(deck.takeCard().toDisplay());
+        }
+      });
+      tabletop.getChildren().add(deck.toDisplay());
+      
+//      tabletop.getChildren().addAll(Loader.loadCards(gameFolder));
       tabletop.setBackground(Loader.loadTabletop(gameFolder));
       
       stage.setScene(new Scene(tabletop, tableWidth, tableHeight));

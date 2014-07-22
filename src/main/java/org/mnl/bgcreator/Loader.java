@@ -17,6 +17,8 @@ import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundSize;
 
 import org.apache.log4j.Logger;
+import org.mnl.bgcreator.domain.Card;
+import org.mnl.bgcreator.domain.Deck;
 import org.mnl.bgcreator.handlers.DraggedHandler;
 import org.mnl.bgcreator.handlers.OnClickHandler;
 
@@ -58,5 +60,24 @@ public class Loader {
       result.add(img);
     }
     return result;
+  }
+  
+  public static Deck loadDeck(File gameFolder) throws FileNotFoundException{
+    Deck deck=new Deck(new File(gameFolder,"cards-reverse.jpg"));
+    
+    for(File card:new File(gameFolder, "cards").listFiles()){
+      log.debug("Loading Card ["+card.getName()+"]");
+      
+      Image image=new Image(new FileInputStream(card));
+      ImageView img=new ImageView(image);
+      img.setCursor(Cursor.HAND);
+      
+      OnClickHandler<ImageView> onClickHandler=new OnClickHandler<ImageView>();
+      img.setOnMousePressed(onClickHandler);
+      img.setOnMouseDragged(new DraggedHandler<ImageView>(onClickHandler));
+      
+      deck.addCard(new Card(img));
+    }
+    return deck;
   }
 }
